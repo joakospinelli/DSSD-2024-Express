@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const User = require("../models/userModel.js");
 const Request = require("../models/requestModel.js");
 
@@ -30,13 +32,42 @@ exports.getUserById = async (req, res) => {
     })
 }
 
-exports.createUser = (req, res) => {
-    return res.status(201).json({
-        status: "success",
-        data: {
-            message: "Hello world!"
-        }
-    })
+exports.createUser = async (req, res) => {
+
+    const { username, password, email, dni, fullName } = req.body;
+
+    if (!username || !password || !email || !dni || !fullName) {
+        return res.status(400).json({
+            status: "fail",
+            message: "A user needs an username, password, email, DNI and full name"
+        });
+    }
+
+    const newUser = User.build({
+        email,
+        dni,
+        username,
+        password,
+        fullName
+    });
+
+    await newUser.save()
+        .then(_ => {
+            newUser.password = undefined; // para que no la muestre en el response
+
+            res.status(201).json({
+                status: "success",
+                data: {
+                    user: newUser
+                }});
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(400).json({
+                status: "fail",
+                message: err.parent.detail
+            })
+        });
 }
 
 exports.updateUserById = (req, res) => {

@@ -22,20 +22,27 @@ exports.login = async (req, res) => {
         });
     }
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({
+        where: { username },
+        attributes: {
+            include: [ "password" ]
+        }
+    });
 
-    //if (!user || !checkPassword(user.password, password)) { por ahora comentado porque las claves no están encriptadas
-    if (!user || user.password !== password) {
+    if (!user || !checkPassword(user.password, password)) {
         return res.status(401).json({
             status: "fail",
             message: "Invalid credentials"
-        })
+        });
     }
+
     const token = signToken(user.id);
     res.cookie('jwt', token, {
         expires: new Date(Date.now() + (process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000)),
         httpOnly: true
     });
+
+    user.password = undefined; // para que no la muestre en el response
 
     return res.status(200).json({
         status: "success",

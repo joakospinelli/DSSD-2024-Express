@@ -40,11 +40,11 @@ const User = sqlize.define('User', {
     },
     fullName: {
         type: DataTypes.STRING,
-        field: "full_name"
+        field: "full_name",
+        allowNull: false
     },
     role: {
         type: DataTypes.ENUM("deposito", "recolector", "administrador"),
-        allowNull: false,
         default: "recolector",
         field: "role"
     },
@@ -59,6 +59,9 @@ const User = sqlize.define('User', {
         beforeCreate: async (user) => {
             user.password = await bcrypt.hash(user.password, 12);
         }
+    },
+    defaultScope: {
+        attributes: { exclude: [ 'password', 'createdAt' ]}
     },
     tableName: "users",
     timestamps: false
