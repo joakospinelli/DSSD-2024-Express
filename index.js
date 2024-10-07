@@ -3,6 +3,7 @@ dotenv.config({ path: './.env' });
 
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const sqlize = require("./database.js");
 
@@ -22,6 +23,7 @@ const app = express();
 
 // --- Middleware
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 app.use(
     cors({
         origin: "*",
