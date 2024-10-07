@@ -11,7 +11,7 @@ const signToken = (id) => {
 }
 
 const checkPassword = async (userPassword, reqPassword) => {
-    return await bcrypt.compare(userPassword, reqPassword);
+    return await bcrypt.compare(reqPassword, userPassword);
 }
 
 exports.protect = async (req, res, next) => {
@@ -69,7 +69,7 @@ exports.login = async (req, res) => {
         }
     });
 
-    if (!user || !checkPassword(user.password, password)) {
+    if (!user || !await checkPassword(user.password, password)) {
         return res.status(401).json({
             status: "fail",
             message: "Invalid credentials"

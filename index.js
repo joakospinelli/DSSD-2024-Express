@@ -4,6 +4,8 @@ dotenv.config({ path: './.env' });
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const swaggerUi = require("swagger-ui-express");
+const yaml = require("yamljs");
 
 const sqlize = require("./database.js");
 
@@ -32,10 +34,12 @@ app.use(
 );
 
 // --- Routes
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(yaml.load("./swagger.yaml")));
 app.use("/api/users", usersRouter);
 app.use("/api/requests", requestsRouter);
 
 const server = app.listen(process.env.SERVER_PORT || 3000, () => {
-    console.log(`Server running on port ${process.env.SERVER_PORT}!`);
+    console.log(`Server running on port ${process.env.SERVER_PORT || 3000}!`);
+    console.log(`Documentation available on localhost:${process.env.SERVER_PORT || 3000}/api/docs`)
     checkDatabase();
 });

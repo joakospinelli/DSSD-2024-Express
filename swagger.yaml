@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: "Ecocycle API - DSSD 2024 (Grupo 2)"
+  description: "Documentación de la API de Ecocycle usando Swagger"
+  version: "1.0.0"
+  contact:
+    name: "Guadalupe Evequoz, Joaquín Spinelli, Pablo Terrone"
+paths:
+  /api/users/login:
+    post:
+      summary: Iniciar sesión
+      description: Obtener token JWT para acceder a la aplicación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: jspinelli
+                password:
+                  type: string
+                  example: jspinelli
+      responses:
+        200:
+          description: Sesión iniciada con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  token:
+                    type: string
+                    example: <JWT>
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          email:
+                            type: string
+                            format: email
+                            example: joaquin@ecocycle.com
+                          dni:
+                            type: integer
+                            example: 12345678
+                          username:
+                            type: string
+                            example: jspinelli
+                          fullName:
+                            type: string
+                            example: Joaquín Spinelli
+                          role:
+                            type: string
+                            example: recolector
+        400:
+          description: Inicio de sesión fallido (campos obligatorios no completados)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Must provide username and password
+        401:
+          description: Inicio de sesión fallido (credenciales inválidas)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Invalid credentials
