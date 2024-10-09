@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const sqlize = require("../database.js");
 const DataTypes = require("sequelize");
 
-const User = sqlize.define('User', {
+const User = sqlize.define("User", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -44,24 +44,28 @@ const User = sqlize.define('User', {
         allowNull: false
     },
     role: {
-        type: DataTypes.ENUM("deposito", "recolector", "administrador"),
-        default: "recolector",
+        type: DataTypes.ENUM("depósito", "recolector", "administrador"),
+        defaultValue: "recolector",
         field: "role"
+    },
+    depositId: { // ESTE CAMPO SÓLO SE USA CON ROL DEPÓSITO. INDICA EL DEPÓSITO EN EL QUE TRABAJA EL USUARIO
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+        field: "deposit_id"
     },
     createdAt: {
         type: DataTypes.DATE,
-        default: new Date(),
+        defaultValue: new Date(),
         field: "created_at"
     }
-},
-{
+}, {
     hooks: {
         beforeCreate: async (user) => {
             user.password = await bcrypt.hash(user.password, 12);
         }
     },
     defaultScope: {
-        attributes: { exclude: [ 'password', 'createdAt' ]}
+        attributes: { exclude: [ "password", "createdAt", "role" ]}
     },
     tableName: "users",
     timestamps: false

@@ -26,7 +26,7 @@ exports.protect = async (req, res, next) => {
 
     // promisify(jwt.verify) retorna una promesa que ejecuta jwt.verify asincrónicamente. después le paso los parámetros que necesitaría verify(token, JWT_SECRET)
     const tokenDecoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    const currentUser = await User.findByPk(tokenDecoded.id);
+    const currentUser = await User.findByPk(tokenDecoded.id, { attributes: { include: [ "role" ] } });
 
     if (!currentUser) { // este caso sólo es posible si el usuario se eliminó
         return res.status(401).json({
@@ -35,7 +35,7 @@ exports.protect = async (req, res, next) => {
         });
     }
 
-    req.user = currentUser; // IMPORTANTE!! setea req.user para que lo puedan usar los próximos middlewares
+    req.user = currentUser.dataValues; // IMPORTANTE!! setea req.user para que lo puedan usar los próximos middlewares
     next();
 }
 
@@ -65,7 +65,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({
         where: { username },
         attributes: {
-            include: [ "password" ]
+            include: [ "password", "role" ]
         }
     });
 
@@ -77,7 +77,7 @@ exports.login = async (req, res) => {
     }
 
     const token = signToken(user.id);
-    res.cookie('jwt', token, {
+    res.cookie("jwt", token, {
         expires: new Date(Date.now() + (process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000)),
         httpOnly: true
     });
@@ -94,7 +94,7 @@ exports.login = async (req, res) => {
 }
 
 exports.logout = async (req, res) => {
-    res.cookie('jwt', '', {
+    res.cookie("jwt", "", {
         expires: new Date(Date.now() + 10 * 1000)
     });
 

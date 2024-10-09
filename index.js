@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-dotenv.config({ path: './.env' });
+dotenv.config({ path: "./.env" });
 
 const express = require("express");
 const cors = require("cors");
@@ -11,24 +11,27 @@ const sqlize = require("./database.js");
 
 const usersRouter = require("./routes/usersRouter.js");
 const requestsRouter = require("./routes/requestsRouter.js");
+const depositsRouter = require("./routes/depositsRouter.js");
+const materialsRouter = require("./routes/materialsRouter.js");
 
 const checkDatabase = async () => {
     try {
         await sqlize.authenticate();
+        await sqlize.sync();
         console.log(`Connected to database ${process.env.DB_DATABASE}!`);
     } catch (err) {
-        console.error('Unable to connect to database: ', err);
+        console.error("Unable to connect to database: ", err);
     }    
 }
 
 const app = express();
 
 // --- Middleware
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 app.use(
     cors({
-        origin: "*",
+        origin: process.env.SERVER_CORS_ORIGINS,
         credentials: true
     })
 );
@@ -37,6 +40,8 @@ app.use(
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(yaml.load("./swagger.yaml")));
 app.use("/api/users", usersRouter);
 app.use("/api/requests", requestsRouter);
+app.use("/api/deposits", depositsRouter);
+app.use("/api/materials", materialsRouter);
 
 const server = app.listen(process.env.SERVER_PORT || 3000, () => {
     console.log(`Server running on port ${process.env.SERVER_PORT || 3000}!`);

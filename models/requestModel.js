@@ -1,8 +1,9 @@
 const sqlize = require("../database.js");
 const DataTypes = require("sequelize");
 const User = require("./userModel.js");
+const MaterialRequest = require("./materialRequestModel.js");
 
-const Request = sqlize.define('Request', {
+const Request = sqlize.define("Request", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -12,14 +13,14 @@ const Request = sqlize.define('Request', {
     },
     received: {
         type: DataTypes.BOOLEAN,
-        default: false,
+        defaultValue: false,
         field: "received"
     },
     depositId: {
         // TODO declarar referencia al depósito (cuando lo modele)
         type: DataTypes.INTEGER,
         allowNull: true,
-        default: null,
+        defaultValue: null,
         field: "deposit_id"
     },
     recolectorId: {
@@ -27,12 +28,12 @@ const Request = sqlize.define('Request', {
         allowNull: false,
         field: "recolector_id"
     }
-},
-{
+}, {
     tableName: "requests",
     timestamps: false
 });
 
-Request.belongsTo(User, { foreignKey: 'recolectorId' });
+Request.belongsTo(User, { foreignKey: "recolectorId", as: "recolector" });
+Request.hasMany(MaterialRequest, { foreignKey: "requestId", as: "materials" });
 
 module.exports = Request;

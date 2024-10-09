@@ -9,7 +9,7 @@ router.get("/logout", auth.protect, auth.logout);
 
 router.route("/")
     .get(auth.protect, controller.getAllUsers)
-    .post(auth.requiresRoles("administrador"), controller.createUser);
+    .post(controller.createUser);
 
 router.route("/:id")
     .get(controller.getUserById)
