@@ -16,6 +16,11 @@ const Request = sqlize.define("Request", {
         defaultValue: false,
         field: "received"
     },
+    caseId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: "case_id"
+    },
     depositId: {
         // TODO declarar referencia al depósito (cuando lo modele)
         type: DataTypes.INTEGER,
@@ -27,6 +32,11 @@ const Request = sqlize.define("Request", {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "recolector_id"
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        default: new Date(Date.now()),
+        field: "created_at"
     }
 }, {
     tableName: "requests",
