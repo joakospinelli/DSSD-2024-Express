@@ -16,8 +16,10 @@ router
 
 router.route("/:id").get(auth.protect, controller.getOrderById);
 
-router.route("/done/:id").get(auth.protect, controller.completeOrderById);
+router.route("/done/:id").put(auth.protect, controller.completeOrderById);
 
-router.route("/assign/:id").get(auth.protect, controller.assignOrderById);
+router.route("/assign").put(auth.protect, controller.assignOrderById);
+
+router.route("/send/:id").put(auth.protect, controller.sendOrderById);
 
 module.exports = router;

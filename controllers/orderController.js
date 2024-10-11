@@ -83,8 +83,8 @@ exports.completeOrderById = async (req, res) => {
       message: `Couldn't find order with ID ${id}`,
     });
 
-  order.status == "done";
-  order.completedAt == Date.now();
+  order.status = "done";
+  order.completedAt = Date.now();
 
   await order
     .save()
@@ -111,8 +111,8 @@ exports.completeOrderById = async (req, res) => {
  * @returns La orden con el estado "assigned".
  */
 exports.assignOrderById = async (req, res) => {
-  const id = req.params.id;
-  const depositId = req.params.depositId;
+  const id = req.body.id;
+  const depositId = req.body.depositId;
   const order = await Order.findByPk(id); // completar con el response
 
   if (!order)
@@ -121,8 +121,8 @@ exports.assignOrderById = async (req, res) => {
       message: `Couldn't find order with ID ${id}`,
     });
 
-  order.status == "assigned";
-  order.depositId == depositId;
+  order.status = "assigned";
+  order.depositId = depositId;
 
   await order
     .save()
@@ -148,7 +148,7 @@ exports.assignOrderById = async (req, res) => {
  * @param {number} res.params.id Id de la orden
  * @returns La orden con el estado "sent".
  */
-exports.completeOrderById = async (req, res) => {
+exports.sendOrderById = async (req, res) => {
   const id = req.params.id;
   const order = await Order.findByPk(id, {
     include: [
@@ -167,7 +167,7 @@ exports.completeOrderById = async (req, res) => {
       message: `Couldn't find order with ID ${id}`,
     });
 
-  order.status == "sent";
+  order.status = "sent";
 
   await order
     .save()
@@ -180,7 +180,6 @@ exports.completeOrderById = async (req, res) => {
       });
     })
     .catch((err) => {
-      console.error(err);
       res.status(400).json({
         status: "fail",
         message: err.parent.detail,
