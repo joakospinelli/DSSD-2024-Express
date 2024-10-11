@@ -1,6 +1,33 @@
 const Order = require("../models/orderModel.js");
 const OrderMaterial = require("../models/orderMaterialModel.js");
 const Material = require("../models/materialModel.js");
+const DepositStock = require("../models/depositStockModel.js");
+
+const actualizarStock = async (deposito, materiales) => {
+  for (const material of materiales) {
+    const { materialId, amount } = material.dataValues;
+
+    const depositStock = await DepositStock.findOne({
+      where: { depositId: deposito, materialId: materialId },
+    });
+
+    if (!depositStock || depositStock.amount < amount) {
+      return false;
+    }
+  }
+
+  for (const material of materiales) {
+    const { materialId, amount } = material.dataValues;
+
+    const depositStock = await DepositStock.findOne({
+      where: { depositId: deposito, materialId: materialId },
+    });
+
+    depositStock.amount -= amount;
+    await depositStock.save();
+  }
+  return true;
+};
 
 /**
  * @returns Devuelve todas las órdenes con el estado "created".
@@ -120,7 +147,7 @@ exports.assignOrderById = async (req, res) => {
 
   const id = req.body.id;
   const depositId = req.body.depositId;
-  const order = await Order.findByPk(id); // completar con el response
+  const order = await Order.findByPk(id);
 
   if (!order)
     return res.status(404).json({
@@ -163,7 +190,21 @@ exports.assignOrderById = async (req, res) => {
  */
 exports.sendOrderById = async (req, res) => {
   const id = req.params.id;
-  const order = await Order.findByPk(id);
+  const order = await Order.findByPk(id, {
+    include: [
+      {
+        model: OrderMaterial,
+        as: "materials",
+        include: [
+          {
+            model: Material,
+            as: "material",
+          },
+        ],
+        required: false,
+      },
+    ],
+  });
 
   if (!order)
     return res.status(404).json({
@@ -172,10 +213,18 @@ exports.sendOrderById = async (req, res) => {
     });
 
   if (!(order.status == "assigned"))
-    return res.status(404).json({
+    return res.status(400).json({
       status: "fail",
       message: `Order status must be "assigned" to complete the order.`,
     });
+
+  const tieneStock = await actualizarStock(order.depositId, order.materials);
+  if (!tieneStock) {
+    return res.status(500).json({
+      status: "fail",
+      message: `The deposit must have stock of the needing materials.`,
+    });
+  }
 
   order.status = "sent";
 
