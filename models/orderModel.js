@@ -13,10 +13,11 @@ const Order = sqlize.define(
     status: {
       type: DataTypes.ENUM(
         "created",
+        "assigned",
         "pending", // esta hace falta?
         "received",
         "done",
-        "canceled" // esta como seria
+        "canceled" // esta como seria?
       ),
       defaultValue: "created",
       field: "status",

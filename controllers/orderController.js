@@ -1,5 +1,8 @@
 const Order = require("../models/orderModel.js");
 
+/**
+ * @returns Devuelve todas las órdenes con el estado "created".
+ */
 exports.getAvailableOrders = async (req, res) => {
   const orders = await Order.findAll();
 
@@ -17,6 +20,10 @@ exports.getAvailableOrders = async (req, res) => {
   });
 };
 
+/**
+ * @param {number} res.params.id Id de la orden
+ * @returns La orden con id recibido por parametro.
+ */
 exports.getOrderById = async (req, res) => {
   const id = req.params.id;
   const order = await Order.findByPk(id, {}); // completar con el response
@@ -35,6 +42,11 @@ exports.getOrderById = async (req, res) => {
   });
 };
 
+/**
+ * Actualiza el estado y la fecha de completitud.
+ * @param {number} res.params.id Id de la orden
+ * @returns La orden con el estado "completed".
+ */
 exports.completeOrderById = async (req, res) => {
   const id = req.params.id;
   const order = await Order.findByPk(id, {}); // completar con el response
@@ -67,6 +79,11 @@ exports.completeOrderById = async (req, res) => {
     });
 };
 
+/**
+ * Actualiza el estado y el deposito que tomo la orden.
+ * @param {number} res.params.id Id de la orden
+ * @returns La orden con el estado "assigned".
+ */
 exports.assignOrderById = async (req, res) => {
   const id = req.params.id;
   const depositId = req.params.depositId;
@@ -78,7 +95,7 @@ exports.assignOrderById = async (req, res) => {
       message: `Couldn't find order with ID ${id}`,
     });
 
-  order.status == "done";
+  order.status == "assigned";
   order.depositId == depositId;
 
   await newOrder
@@ -100,6 +117,9 @@ exports.assignOrderById = async (req, res) => {
     });
 };
 
+/**
+ * @returns La orden creada por la red global.
+ */
 exports.createOrder = async (req, res) => {
   const { observations, materials } = req.body;
 
