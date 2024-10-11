@@ -1,13 +1,13 @@
 const controller = require("../controllers/orderController.js");
+const auth = require("../controllers/authController.js");
 
 const { Router } = require("express");
 
 const router = Router();
 
-router.route("/").get(auth.protect, controller.getAvailableOrders);
-
 router
-  .route("/create")
+  .route("/")
+  .get(auth.protect, controller.getAvailableOrders)
   .post(
     auth.protect,
     auth.requiresRoles("administrador"),

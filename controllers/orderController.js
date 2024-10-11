@@ -1,15 +1,27 @@
 const Order = require("../models/orderModel.js");
+const OrderMaterial = require("../models/orderMaterialModel.js");
+const Material = require("../models/materialModel.js");
 
 /**
  * @returns Devuelve todas las órdenes con el estado "created".
  */
 exports.getAvailableOrders = async (req, res) => {
-  const orders = await Order.findAll();
-
-  // preguntar a joaco como hacer acá el filter
-  // pq no se que objeto seria orders
-
-  //filter((e) => e.status === "created")
+  const orders = await Order.findAll({
+    where: { status: "created" },
+    include: [
+      {
+        model: OrderMaterial,
+        as: "materials",
+        include: [
+          {
+            model: Material,
+            as: "material",
+          },
+        ],
+        required: false,
+      },
+    ],
+  });
 
   return res.status(200).json({
     status: "success",
@@ -26,7 +38,21 @@ exports.getAvailableOrders = async (req, res) => {
  */
 exports.getOrderById = async (req, res) => {
   const id = req.params.id;
-  const order = await Order.findByPk(id, {}); // completar con el response
+  const order = await Order.findByPk(id, {
+    include: [
+      {
+        model: OrderMaterial,
+        as: "materials",
+        include: [
+          {
+            model: Material,
+            as: "material",
+          },
+        ],
+        required: false,
+      },
+    ],
+  });
 
   if (!order)
     return res.status(404).json({
@@ -45,11 +71,11 @@ exports.getOrderById = async (req, res) => {
 /**
  * Actualiza el estado y la fecha de completitud.
  * @param {number} res.params.id Id de la orden
- * @returns La orden con el estado "completed".
+ * @returns La orden con el estado "done".
  */
 exports.completeOrderById = async (req, res) => {
   const id = req.params.id;
-  const order = await Order.findByPk(id, {}); // completar con el response
+  const order = await Order.findByPk(id); // completar con el response
 
   if (!order)
     return res.status(404).json({
@@ -60,7 +86,7 @@ exports.completeOrderById = async (req, res) => {
   order.status == "done";
   order.completedAt == Date.now();
 
-  await newOrder
+  await order
     .save()
     .then((_) => {
       res.status(201).json({
@@ -87,7 +113,7 @@ exports.completeOrderById = async (req, res) => {
 exports.assignOrderById = async (req, res) => {
   const id = req.params.id;
   const depositId = req.params.depositId;
-  const order = await Order.findByPk(id, {}); // completar con el response
+  const order = await Order.findByPk(id); // completar con el response
 
   if (!order)
     return res.status(404).json({
@@ -98,7 +124,52 @@ exports.assignOrderById = async (req, res) => {
   order.status == "assigned";
   order.depositId == depositId;
 
-  await newOrder
+  await order
+    .save()
+    .then((_) => {
+      res.status(201).json({
+        status: "success",
+        data: {
+          order: order,
+        },
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(400).json({
+        status: "fail",
+        message: err.parent.detail,
+      });
+    });
+};
+
+/**
+ * Actualiza el estado.
+ * @param {number} res.params.id Id de la orden
+ * @returns La orden con el estado "sent".
+ */
+exports.completeOrderById = async (req, res) => {
+  const id = req.params.id;
+  const order = await Order.findByPk(id, {
+    include: [
+      {
+        model: OrderMaterial,
+        as: "materials",
+        include: [{ model: Material, as: "material" }],
+        required: false,
+      },
+    ],
+  });
+
+  if (!order)
+    return res.status(404).json({
+      status: "fail",
+      message: `Couldn't find order with ID ${id}`,
+    });
+
+  order.status == "sent";
+
+  await order
     .save()
     .then((_) => {
       res.status(201).json({
@@ -129,12 +200,22 @@ exports.createOrder = async (req, res) => {
       message: "An order needs materials",
     });
 
-  // falta settear createdAt y status en created
-  const newOrder = Order.build({ materials, observations });
+  const newOrder = Order.build({
+    observations,
+  });
 
   await newOrder
     .save()
     .then((_) => {
+      materials.forEach(async (e) => {
+        const newMaterial = OrderMaterial.build({
+          amount: e.amount,
+          materialId: e.id,
+          orderId: newOrder.id,
+        });
+        await newMaterial.save();
+      });
+
       res.status(201).json({
         status: "success",
         data: {

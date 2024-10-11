@@ -1,5 +1,6 @@
-import sqlize from "../database";
-import { DataTypes } from "sequelize";
+const sqlize = require("../database");
+const { DataTypes } = require("sequelize");
+const OrderMaterial = require("../models/orderMaterialModel.js");
 
 const Order = sqlize.define(
   "Order",
@@ -14,8 +15,7 @@ const Order = sqlize.define(
       type: DataTypes.ENUM(
         "created",
         "assigned",
-        "pending", // esta hace falta?
-        "received",
+        "sent",
         "done",
         "canceled" // esta como seria?
       ),
@@ -28,7 +28,7 @@ const Order = sqlize.define(
     },
     createdAt: {
       type: DataTypes.DATE,
-      default: new Date(Date.now()),
+      defaultValue: new Date(Date.now()),
       field: "created_at",
     },
     completedAt: {
@@ -45,5 +45,7 @@ const Order = sqlize.define(
     timestamps: false,
   }
 );
+
+Order.hasMany(OrderMaterial, { foreignKey: "orderId", as: "materials" });
 
 module.exports = Order;
