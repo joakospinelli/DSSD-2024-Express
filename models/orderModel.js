@@ -12,13 +12,7 @@ const Order = sqlize.define(
       field: "id",
     },
     status: {
-      type: DataTypes.ENUM(
-        "created",
-        "assigned",
-        "sent",
-        "done",
-        "canceled" // esta como seria?
-      ),
+      type: DataTypes.ENUM("created", "assigned", "sent", "done", "canceled"),
       defaultValue: "created",
       field: "status",
     },

@@ -83,6 +83,12 @@ exports.completeOrderById = async (req, res) => {
       message: `Couldn't find order with ID ${id}`,
     });
 
+  if (!(order.status == "sent"))
+    return res.status(404).json({
+      status: "fail",
+      message: `Couldn't change the order status. Current status: ${order.status}`,
+    });
+
   order.status = "done";
   order.completedAt = Date.now();
 
@@ -121,6 +127,12 @@ exports.assignOrderById = async (req, res) => {
       message: `Couldn't find order with ID ${id}`,
     });
 
+  if (!(order.status == "created"))
+    return res.status(404).json({
+      status: "fail",
+      message: `Couldn't change the order status. Current status: ${order.status}`,
+    });
+
   order.status = "assigned";
   order.depositId = depositId;
 
@@ -150,21 +162,18 @@ exports.assignOrderById = async (req, res) => {
  */
 exports.sendOrderById = async (req, res) => {
   const id = req.params.id;
-  const order = await Order.findByPk(id, {
-    include: [
-      {
-        model: OrderMaterial,
-        as: "materials",
-        include: [{ model: Material, as: "material" }],
-        required: false,
-      },
-    ],
-  });
+  const order = await Order.findByPk(id);
 
   if (!order)
     return res.status(404).json({
       status: "fail",
       message: `Couldn't find order with ID ${id}`,
+    });
+
+  if (!(order.status == "assigned"))
+    return res.status(404).json({
+      status: "fail",
+      message: `Couldn't change the order status. Current status: ${order.status}`,
     });
 
   order.status = "sent";
