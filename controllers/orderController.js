@@ -8,19 +8,6 @@ const Material = require("../models/materialModel.js");
 exports.getAvailableOrders = async (req, res) => {
   const orders = await Order.findAll({
     where: { status: "created" },
-    include: [
-      {
-        model: OrderMaterial,
-        as: "materials",
-        include: [
-          {
-            model: Material,
-            as: "material",
-          },
-        ],
-        required: false,
-      },
-    ],
   });
 
   return res.status(200).json({
@@ -86,7 +73,7 @@ exports.completeOrderById = async (req, res) => {
   if (!(order.status == "sent"))
     return res.status(404).json({
       status: "fail",
-      message: `Couldn't change the order status. Current status: ${order.status}`,
+      message: `Order status must be "sent" to complete the order.`,
     });
 
   order.status = "done";
@@ -106,7 +93,7 @@ exports.completeOrderById = async (req, res) => {
       console.error(err);
       res.status(400).json({
         status: "fail",
-        message: err.parent.detail,
+        message: err.message || "An error occurred.",
       });
     });
 };
@@ -117,6 +104,20 @@ exports.completeOrderById = async (req, res) => {
  * @returns La orden con el estado "assigned".
  */
 exports.assignOrderById = async (req, res) => {
+  if (!req.body.depositId || typeof req.body.depositId !== "number") {
+    return res.status(400).json({
+      status: "fail",
+      message: "Invalid or missing depositId.",
+    });
+  }
+
+  if (!req.body.id || typeof req.body.id !== "number") {
+    return res.status(400).json({
+      status: "fail",
+      message: "Invalid or missing order Id.",
+    });
+  }
+
   const id = req.body.id;
   const depositId = req.body.depositId;
   const order = await Order.findByPk(id); // completar con el response
@@ -128,9 +129,9 @@ exports.assignOrderById = async (req, res) => {
     });
 
   if (!(order.status == "created"))
-    return res.status(404).json({
+    return res.status(400).json({
       status: "fail",
-      message: `Couldn't change the order status. Current status: ${order.status}`,
+      message: `Order status must be "created" to complete the order.`,
     });
 
   order.status = "assigned";
@@ -150,7 +151,7 @@ exports.assignOrderById = async (req, res) => {
       console.error(err);
       res.status(400).json({
         status: "fail",
-        message: err.parent.detail,
+        message: err.message || "An error occurred.",
       });
     });
 };
@@ -173,7 +174,7 @@ exports.sendOrderById = async (req, res) => {
   if (!(order.status == "assigned"))
     return res.status(404).json({
       status: "fail",
-      message: `Couldn't change the order status. Current status: ${order.status}`,
+      message: `Order status must be "assigned" to complete the order.`,
     });
 
   order.status = "sent";
@@ -191,7 +192,7 @@ exports.sendOrderById = async (req, res) => {
     .catch((err) => {
       res.status(400).json({
         status: "fail",
-        message: err.parent.detail,
+        message: err.message || "An error occurred.",
       });
     });
 };
@@ -205,7 +206,7 @@ exports.createOrder = async (req, res) => {
   if (materials.length === 0)
     return res.status(400).json({
       status: "fail",
-      message: "An order needs materials",
+      message: "An order must have materials.",
     });
 
   const newOrder = Order.build({
@@ -235,7 +236,7 @@ exports.createOrder = async (req, res) => {
       console.error(err);
       res.status(400).json({
         status: "fail",
-        message: err.parent.detail,
+        message: err.message || "An error occurred.",
       });
     });
 };
