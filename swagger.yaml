@@ -88,3 +88,198 @@ paths:
                   message:
                     type: string
                     example: Invalid credentials
+  /api/orders:
+    get:
+      summary: Obtener todas las órdenes disponibles
+      description: Devuelve todas las órdenes con el estado "created".
+      responses:
+        200:
+          description: Lista de órdenes obtenida con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: integer
+                        example: 1
+                      orders:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            status:
+                              type: string
+                              example: "created"
+                            depositId:
+                              type: integer
+                              example: null
+                            createdAt:
+                              type: string
+                              example: "2024-10-11T19:28:24.851Z"
+                            completedAt:
+                              type: string
+                              example: null
+                            observations:
+                              type: string
+                              example: "Entrega urgente"
+    post:
+      summary: Crear una nueva orden
+      description: Crea una nueva orden con observaciones y materiales.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                observations:
+                  type: string
+                  example: "Necesario antes del viernes"
+                materials:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      amount:
+                        type: integer
+                        example: 5
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      amount:
+                        type: integer
+                        example: 10
+      responses:
+        201:
+          description: Orden creada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      order:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: "created"
+                          createdAt:
+                            type: string
+                            example: "2024-10-12T18:08:22.473Z"
+                          completedAt:
+                            type: string
+                            example: null
+                          depopsitId:
+                            type: integer
+                            example: null
+                          observations:
+                            type: string
+                            example: "Necesario antes del viernes"
+        400:
+          description: Error en la solicitud (campos obligatorios faltantes o inválidos)
+  /api/orders/{id}:
+    get:
+      summary: Obtener una orden por ID
+      description: Devuelve la orden con el ID especificado.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID de la orden
+      responses:
+        200:
+          description: Orden obtenida con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      order:
+                        type: object
+                        properties:
+                          id:
+                              type: integer
+                              example: 1
+                          status:
+                              type: string
+                              example: "created"
+                          depositId:
+                              type: integer
+                              example: null
+                          createdAt:
+                              type: string
+                              example: "2024-10-11T19:28:24.851Z"
+                          completedAt:
+                              type: string
+                              example: null
+                          observations:
+                              type: string
+                              example: "Entrega urgente"
+                          materials:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                    id:
+                                      type: integer
+                                      example: 1
+                                    amount:
+                                      type: integer
+                                      example: 10
+                                    materialId:
+                                      type: integer
+                                      example: 2
+                                    orderId:
+                                      type: integer
+                                      example: 1
+                                    material:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: integer
+                                            example: 2
+                                          name:
+                                            type: string
+                                            example: "Tela"
+                                          unit:
+                                            type: string
+                                            example: "Unidades"
+                                          pricePerUnit:
+                                            type: double
+                                            example: 20
+        404:
+          description: Orden no encontrada
