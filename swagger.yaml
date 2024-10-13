@@ -201,6 +201,17 @@ paths:
                             example: "Necesario antes del viernes"
         400:
           description: Error en la solicitud (campos obligatorios faltantes o inválidos)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: An order must have materials.
   /api/orders/{id}:
     get:
       summary: Obtener una orden por ID
@@ -283,3 +294,303 @@ paths:
                                             example: 20
         404:
           description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Couldn't find order with ID 1
+  /api/orders/assign:
+    put:
+      summary: Asignar una orden a un depósito
+      description: Asigna una orden a un depósito utilizando el ID de la orden y el ID del depósito.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 9
+                depositId:
+                  type: integer
+                  example: 1
+      responses:
+        201:
+          description: Orden asignada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: integer
+                        example: 1
+                      orders:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 9
+                            status:
+                              type: string
+                              example: "assigned"
+                            depositId:
+                              type: integer
+                              example: 1
+                            createdAt:
+                              type: string
+                              example: "2024-10-11T19:28:24.851Z"
+                            completedAt:
+                              type: string
+                              example: null
+                            observations:
+                              type: string
+                              example: "Entrega urgente"
+        400:
+          description: Error en la solicitud (falta algún campo obligatorio)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Invalid or missing depositId/Id
+        404:
+          description: Orden o depósito no encontrados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Couldn't find order/deposit with ID
+        405:
+          description: Orden con estado inconsistente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Order status must be "created" to complete the order.
+  /api/orders/send/{id}:
+    put:
+      summary: Marcar una orden como enviada
+      description: Marca una orden como enviada utilizando su ID, verificando el stock de materiales.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID de la orden
+      responses:
+        201:
+          description: Orden marcada como enviada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: integer
+                        example: 1
+                      orders:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 9
+                            status:
+                              type: string
+                              example: "sent"
+                            depositId:
+                              type: integer
+                              example: 1
+                            createdAt:
+                              type: string
+                              example: "2024-10-11T19:28:24.851Z"
+                            completedAt:
+                              type: string
+                              example: null
+                            observations:
+                              type: string
+                              example: "Entrega urgente"
+        400:
+          description: Error en la solicitud (falta algún campo obligatorio)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Invalid or missing order Id
+        404:
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Couldn't find order with ID
+        405:
+          description: Orden con estado inconsistente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Order status must be "assigned" to complete the order.
+        500:
+          description: El depósito no tiene stock suficiente de materiales
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: The deposit must have stock of the needing materials.
+  /api/orders/done/{id}:
+    put:
+      summary: Marcar una orden como completada
+      description: Marca una orden como completada utilizando su ID.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID de la orden
+      responses:
+        201:
+          description: Orden marcada como completada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: integer
+                        example: 1
+                      orders:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 9
+                            status:
+                              type: string
+                              example: "done"
+                            depositId:
+                              type: integer
+                              example: 1
+                            createdAt:
+                              type: string
+                              example: "2024-10-11T19:28:24.851Z"
+                            completedAt:
+                              type: string
+                              example: 2024-10-12T19:28:24.851Z"
+                            observations:
+                              type: string
+                              example: "Entrega urgente"
+        400:
+          description: Error en la solicitud (falta algún campo obligatorio)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Invalid or missing order Id
+        404:
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Couldn't find order with ID
+        405:
+          description: Orden con estado inconsistente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Order status must be "sent" to complete the order.

@@ -2,6 +2,7 @@ const Order = require("../models/orderModel.js");
 const OrderMaterial = require("../models/orderMaterialModel.js");
 const Material = require("../models/materialModel.js");
 const DepositStock = require("../models/depositStockModel.js");
+const Deposit = require("../models/depositModel.js");
 
 const actualizarStock = async (deposito, materiales) => {
   for (const material of materiales) {
@@ -88,6 +89,13 @@ exports.getOrderById = async (req, res) => {
  * @returns La orden con el estado "done".
  */
 exports.completeOrderById = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Invalid or missing order Id.",
+    });
+  }
+
   const id = req.params.id;
   const order = await Order.findByPk(id); // completar con el response
 
@@ -98,7 +106,7 @@ exports.completeOrderById = async (req, res) => {
     });
 
   if (!(order.status == "sent"))
-    return res.status(404).json({
+    return res.status(405).json({
       status: "fail",
       message: `Order status must be "sent" to complete the order.`,
     });
@@ -131,13 +139,6 @@ exports.completeOrderById = async (req, res) => {
  * @returns La orden con el estado "assigned".
  */
 exports.assignOrderById = async (req, res) => {
-  if (!req.body.depositId || typeof req.body.depositId !== "number") {
-    return res.status(400).json({
-      status: "fail",
-      message: "Invalid or missing depositId.",
-    });
-  }
-
   if (!req.body.id || typeof req.body.id !== "number") {
     return res.status(400).json({
       status: "fail",
@@ -145,9 +146,17 @@ exports.assignOrderById = async (req, res) => {
     });
   }
 
+  if (!req.body.depositId || typeof req.body.depositId !== "number") {
+    return res.status(400).json({
+      status: "fail",
+      message: "Invalid or missing depositId.",
+    });
+  }
+
   const id = req.body.id;
   const depositId = req.body.depositId;
   const order = await Order.findByPk(id);
+  const deposit = await Deposit.findByPk(depositId);
 
   if (!order)
     return res.status(404).json({
@@ -155,8 +164,14 @@ exports.assignOrderById = async (req, res) => {
       message: `Couldn't find order with ID ${id}`,
     });
 
+  if (!deposit)
+    return res.status(404).json({
+      status: "fail",
+      message: `Couldn't find deposit with ID ${depositId}`,
+    });
+
   if (!(order.status == "created"))
-    return res.status(400).json({
+    return res.status(405).json({
       status: "fail",
       message: `Order status must be "created" to complete the order.`,
     });
@@ -189,6 +204,13 @@ exports.assignOrderById = async (req, res) => {
  * @returns La orden con el estado "sent".
  */
 exports.sendOrderById = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Invalid or missing order Id.",
+    });
+  }
+
   const id = req.params.id;
   const order = await Order.findByPk(id, {
     include: [
@@ -213,7 +235,7 @@ exports.sendOrderById = async (req, res) => {
     });
 
   if (!(order.status == "assigned"))
-    return res.status(400).json({
+    return res.status(405).json({
       status: "fail",
       message: `Order status must be "assigned" to complete the order.`,
     });
