@@ -12,6 +12,8 @@ tags:
     description: "Operaciones relacionadas con las órdenes"
   - name: "Materiales"
     description: "Operaciones relacionadas con los materiales"
+  - name: "Depósitos"
+    description: "Operaciones relacionadas con los depósitos"
 paths:
   /api/users/login:
     post:
@@ -615,3 +617,298 @@ paths:
                   message:
                     type: string
                     example: Order status must be "sent" to complete the order.
+  /api/materials:
+    get:
+      tags:
+        - Materiales
+      summary: Obtener todos los materiales
+      description: Obtiene una lista con todos los materiales cargados en la plataforma.
+      responses:
+        200:
+          description: Materiales obtenidos con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: integer
+                        example: 1
+                      materials:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: Vidrio
+                            unit:
+                              type: string
+                              example: Unidades
+                            pricePerUnit:
+                              type: double
+                              example: 10
+    post:
+      tags:
+        - Materiales
+      summary: Crear nuevo material
+      description: Carga un nuevo material en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Vidrio
+                unit:
+                  type: string
+                  example: Unidades
+                  required: false
+                pricePerUnit:
+                  type: double
+                  example: 20
+      responses:
+        200:
+          description: Material cargado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      material:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Vidrio
+                          unit:
+                            type: string
+                            example: Unidades
+                          pricePerUnit:
+                            type: double
+                            example: 20
+        400:
+          description: Fallo por campos obligatorios incompletos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: A material needs a name and a price per unit
+  /api/deposits:
+    get:
+      tags:
+        - Depósitos
+      summary: Obtener todos los depósitos
+      description: Retorna una lista con todos los depósitos de la aplicación.
+      responses:
+        200:
+          description: Depósitos obtenidos con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: integer
+                        example: 1
+                      deposits:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: Depósito 1
+                            address:
+                              type: string
+                              example: 1 2345
+                            contactEmail:
+                              type: string
+                              example: deposito1@ecocycle.com
+    post:
+      tags:
+        - Depósitos
+      summary: Crear depósito
+      description: Crea un nuevo depósito en la aplicación.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Depósito 1
+                address:
+                  type: string
+                  example: 1 2345
+                contactEmail:
+                  type: string
+                  example: deposito1@ecocycle.com
+      responses:
+        200:
+          description: Depósito creado con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      deposit:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: Depósito 1
+                          address:
+                            type: string
+                            example: 1 2345
+                          contactEmail:
+                            type: string
+                            example: deposito1@ecocycle.com
+        400:
+          description: Error por campos obligatorios incompletos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: A deposit needs a name
+        400:
+          description: Error por nombre repetido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Ya existe la llave (name)=(Depósito 1)
+  /api/deposits/{id}:
+    get:
+      summary: Obtener depósito específico
+      description: Obtiene un depósito en específico a partir de su ID, junto con su respectivo stock
+      tags:
+        - Depósitos
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID de la orden
+      responses:
+        200:
+          summary: Depósito obtenido con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      deposit:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: Depósito 1
+                          address:
+                            type: string
+                            example: 1 2345
+                          contactEmail:
+                            type: string
+                            example: deposito1@ecocycle.com
+                          stock:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                amount:
+                                  type: double
+                                  example: 4
+                                material:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      example: 1
+                                    name:
+                                      type: string
+                                      example: Vidrio
+                                    unit:
+                                      type: string
+                                      example: unidades
+                                    pricePerUnit:
+                                      type: double
+                                      example: 20
+        400:
+          summary: Depósito no encontrado por ID inexistente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Couldn't find deposit with ID <ID>
