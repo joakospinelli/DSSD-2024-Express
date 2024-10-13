@@ -5,9 +5,18 @@ info:
   version: "1.0.0"
   contact:
     name: "Guadalupe Evequoz, Joaquín Spinelli, Pablo Terrone"
+tags:
+  - name: "Usuarios"
+    description: "Operaciones relacionadas con los usuarios"
+  - name: "Órdenes"
+    description: "Operaciones relacionadas con las órdenes"
+  - name: "Materiales"
+    description: "Operaciones relacionadas con los materiales"
 paths:
   /api/users/login:
     post:
+      tags:
+        - "Usuarios"
       summary: Iniciar sesión
       description: Obtener token JWT para acceder a la aplicación
       requestBody:
@@ -90,6 +99,8 @@ paths:
                     example: Invalid credentials
   /api/orders:
     get:
+      tags:
+        - "Órdenes"
       summary: Obtener todas las órdenes disponibles
       description: Devuelve todas las órdenes con el estado "created".
       responses:
@@ -133,6 +144,8 @@ paths:
                               type: string
                               example: "Entrega urgente"
     post:
+      tags:
+        - "Órdenes"
       summary: Crear una nueva orden
       description: Crea una nueva orden con observaciones y materiales.
       requestBody:
@@ -214,6 +227,8 @@ paths:
                     example: An order must have materials.
   /api/orders/{id}:
     get:
+      tags:
+        - "Órdenes"
       summary: Obtener una orden por ID
       description: Devuelve la orden con el ID especificado.
       parameters:
@@ -307,6 +322,8 @@ paths:
                     example: Couldn't find order with ID 1
   /api/orders/assign:
     put:
+      tags:
+        - "Órdenes"
       summary: Asignar una orden a un depósito
       description: Asigna una orden a un depósito utilizando el ID de la orden y el ID del depósito.
       requestBody:
@@ -403,6 +420,8 @@ paths:
                     example: Order status must be "created" to complete the order.
   /api/orders/send/{id}:
     put:
+      tags:
+        - "Órdenes"
       summary: Marcar una orden como enviada
       description: Marca una orden como enviada utilizando su ID, verificando el stock de materiales.
       parameters:
@@ -506,6 +525,8 @@ paths:
                     example: The deposit must have stock of the needing materials.
   /api/orders/done/{id}:
     put:
+      tags:
+        - "Órdenes"
       summary: Marcar una orden como completada
       description: Marca una orden como completada utilizando su ID.
       parameters:
