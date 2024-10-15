@@ -99,6 +99,39 @@ paths:
                   message:
                     type: string
                     example: Invalid credentials
+  /api/users/logout:
+    get:
+      tags:
+        - "Usuarios"
+      summary: Cerrar sesión
+      description: Elimina la cookie jwt para finalizar la sesión del usuario.
+      responses:
+        204:
+          description: Sesión cerrada con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    nullable: true
+        400:
+          description: Error en la solicitud para cerrar sesión
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: You need to be authenticated to do this action
   /api/orders:
     get:
       tags:
