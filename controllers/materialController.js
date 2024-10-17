@@ -13,7 +13,7 @@ exports.getAllMaterials = async (req, res) => {
 }
 
 exports.createMaterial = async (req, res) => {
-    const { name, pricePerUnit } = req.body;
+    const { name, unit, pricePerUnit } = req.body;
 
     if (!name || !pricePerUnit) return res.status(400).json({
         status: "fail",
