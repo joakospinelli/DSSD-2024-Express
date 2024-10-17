@@ -20,7 +20,7 @@ exports.createMaterial = async (req, res) => {
         message: "A material needs a name and a price per unit"
     });
 
-    const newMaterial = Material.build({ name, pricePerUnit });
+    const newMaterial = Material.build({ name, unit, pricePerUnit });
 
     await newMaterial.save()
         .then(_ => {
