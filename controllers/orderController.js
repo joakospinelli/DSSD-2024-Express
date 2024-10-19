@@ -3,8 +3,9 @@ const OrderMaterial = require("../models/orderMaterialModel.js");
 const Material = require("../models/materialModel.js");
 const DepositStock = require("../models/depositStockModel.js");
 const Deposit = require("../models/depositModel.js");
+const catchErrors = require("../utils/catchErrors.js");
 
-const actualizarStock = async (deposito, materiales) => {
+const actualizarStock = catchErrors(async (deposito, materiales) => {
   for (const material of materiales) {
     const { materialId, amount } = material.dataValues;
 
@@ -28,12 +29,12 @@ const actualizarStock = async (deposito, materiales) => {
     await depositStock.save();
   }
   return true;
-};
+});
 
 /**
  * @returns Devuelve todas las órdenes con el estado "created".
  */
-exports.getAvailableOrders = async (req, res) => {
+exports.getAvailableOrders = catchErrors(async (req, res) => {
   const orders = await Order.findAll({
     where: { status: "created" },
   });
@@ -45,13 +46,13 @@ exports.getAvailableOrders = async (req, res) => {
       orders,
     },
   });
-};
+});
 
 /**
  * @param {number} res.params.id Id de la orden
  * @returns La orden con id recibido por parametro.
  */
-exports.getOrderById = async (req, res) => {
+exports.getOrderById = catchErrors(async (req, res) => {
   const id = req.params.id;
   const order = await Order.findByPk(id, {
     include: [
@@ -81,14 +82,14 @@ exports.getOrderById = async (req, res) => {
       order,
     },
   });
-};
+});
 
 /**
  * Actualiza el estado y la fecha de completitud.
  * @param {number} res.params.id Id de la orden
  * @returns La orden con el estado "done".
  */
-exports.completeOrderById = async (req, res) => {
+exports.completeOrderById = catchErrors(async (req, res) => {
   if (!req.params.id) {
     return res.status(400).json({
       status: "fail",
@@ -131,14 +132,14 @@ exports.completeOrderById = async (req, res) => {
         message: err.message || "An error occurred.",
       });
     });
-};
+});
 
 /**
  * Actualiza el estado y el deposito que tomo la orden.
  * @param {number} res.params.id Id de la orden
  * @returns La orden con el estado "assigned".
  */
-exports.assignOrderById = async (req, res) => {
+exports.assignOrderById = catchErrors(async (req, res) => {
   if (!req.body.id || typeof req.body.id !== "number") {
     return res.status(400).json({
       status: "fail",
@@ -196,14 +197,14 @@ exports.assignOrderById = async (req, res) => {
         message: err.message || "An error occurred.",
       });
     });
-};
+});
 
 /**
  * Actualiza el estado.
  * @param {number} res.params.id Id de la orden
  * @returns La orden con el estado "sent".
  */
-exports.sendOrderById = async (req, res) => {
+exports.sendOrderById = catchErrors(async (req, res) => {
   if (!req.params.id) {
     return res.status(400).json({
       status: "fail",
@@ -266,12 +267,12 @@ exports.sendOrderById = async (req, res) => {
         message: err.message || "An error occurred.",
       });
     });
-};
+});
 
 /**
  * @returns La orden creada por la red global.
  */
-exports.createOrder = async (req, res) => {
+exports.createOrder = catchErrors(async (req, res) => {
   const { observations, materials } = req.body;
 
   if (materials.length === 0)
@@ -310,4 +311,4 @@ exports.createOrder = async (req, res) => {
         message: err.message || "An error occurred.",
       });
     });
-};
+});

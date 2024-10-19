@@ -2,8 +2,9 @@ const Deposit = require("../models/depositModel.js");
 const DepositStock = require("../models/depositStockModel.js");
 const Material = require("../models/materialModel.js");
 const User = require("../models/userModel.js");
+const catchErrors = require("../utils/catchErrors.js");
 
-exports.getAllDeposits = async (req, res) => {
+exports.getAllDeposits = catchErrors(async (req, res) => {
     const deposits = await Deposit.findAll();
 
     return res.status(200).json({
@@ -13,9 +14,9 @@ exports.getAllDeposits = async (req, res) => {
             deposits
         }
     })
-}
+});
 
-exports.getDepositById = async (req, res) => {
+exports.getDepositById = catchErrors(async (req, res) => {
     const id = req.params.id;
     const deposit = await Deposit.findByPk(id, {
         include: [
@@ -43,9 +44,9 @@ exports.getDepositById = async (req, res) => {
             deposit
         }
     });
-}
+});
 
-exports.createDeposit = async (req, res) => {
+exports.createDeposit = catchErrors(async (req, res) => {
     const { name, address, contactEmail } = req.body;
 
     if (!name) return res.status(400).json({
@@ -71,4 +72,4 @@ exports.createDeposit = async (req, res) => {
                 message: err.parent.detail
             });
         })
-}
+});

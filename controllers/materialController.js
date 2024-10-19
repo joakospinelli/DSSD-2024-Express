@@ -1,6 +1,7 @@
 const Material = require("../models/materialModel.js");
+const catchErrors = require("../utils/catchErrors.js");
 
-exports.getAllMaterials = async (req, res) => {
+exports.getAllMaterials = catchErrors(async (req, res) => {
     const materials = await Material.findAll();
 
     return res.status(200).json({
@@ -10,9 +11,9 @@ exports.getAllMaterials = async (req, res) => {
             materials
         }
     });
-}
+});
 
-exports.createMaterial = async (req, res) => {
+exports.createMaterial = catchErrors(async (req, res) => {
     const { name, unit, pricePerUnit } = req.body;
 
     if (!name || !pricePerUnit) return res.status(400).json({
@@ -38,4 +39,4 @@ exports.createMaterial = async (req, res) => {
                 message: err.parent.detail
             });
         })
-}
+});

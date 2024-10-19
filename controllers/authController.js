@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { promisify } = require("util");
 
 const User = require("../models/userModel.js");
+const catchErrors = require("../utils/catchErrors.js");
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -14,7 +15,7 @@ const checkPassword = async (userPassword, reqPassword) => {
     return await bcrypt.compare(reqPassword, userPassword);
 }
 
-exports.protect = async (req, res, next) => {
+exports.protect = catchErrors(async (req, res, next) => {
     const token = req.cookies.jwt;
 
     if (!token) {
@@ -37,7 +38,7 @@ exports.protect = async (req, res, next) => {
 
     req.user = currentUser.dataValues; // IMPORTANTE!! setea req.user para que lo puedan usar los próximos middlewares
     next();
-}
+});
 
 // esto en realidad es una función que retorna una función, por eso se puede invocar en el middleware sin que rompa
 exports.requiresRoles = (...roles) => {
@@ -52,7 +53,7 @@ exports.requiresRoles = (...roles) => {
     }
 } 
 
-exports.login = async (req, res) => {
+exports.login = catchErrors(async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -91,7 +92,7 @@ exports.login = async (req, res) => {
             user
         }
     });
-}
+});
 
 exports.logout = async (req, res) => {
     res.cookie("jwt", "", {

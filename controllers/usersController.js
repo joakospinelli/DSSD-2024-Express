@@ -1,6 +1,7 @@
 const User = require("../models/userModel.js");
+const catchErrors = require("../utils/catchErrors.js");
 
-exports.getAllUsers = async (req, res) => {
+exports.getAllUsers = catchErrors(async (req, res) => {
     const users = await User.findAll();
 
     return res.status(200).json({
@@ -10,9 +11,9 @@ exports.getAllUsers = async (req, res) => {
             users
         }
     })
-}
+});
 
-exports.getUserById = async (req, res) => {
+exports.getUserById = catchErrors(async (req, res) => {
     const id = req.params.id;
     const user = await User.findByPk(id, {
         attributes: {
@@ -31,9 +32,9 @@ exports.getUserById = async (req, res) => {
             user
         }
     })
-}
+});
 
-exports.createUser = async (req, res) => {
+exports.createUser = catchErrors(async (req, res) => {
     const { username, password, email, dni, fullName } = req.body;
 
     if (!username || !password || !email || !dni || !fullName) {
@@ -68,7 +69,7 @@ exports.createUser = async (req, res) => {
                 message: err.parent.detail
             })
         });
-}
+});
 
 exports.updateUserById = (req, res) => {
     return res.status(200).json({

@@ -1,8 +1,9 @@
 const Request = require("../models/requestModel.js");
 const User = require("../models/userModel.js");
 const MaterialRequest = require("../models/materialRequestModel.js");
+const catchErrors = require("../utils/catchErrors.js");
 
-exports.getAllRequests = async (req, res) => {
+exports.getAllRequests = catchErrors(async (req, res) => {
     const requests = await Request.findAll({
         include: [
             { model: User, as: "recolector" },
@@ -17,4 +18,4 @@ exports.getAllRequests = async (req, res) => {
             requests
         }
     })
-}
+});

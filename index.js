@@ -49,6 +49,14 @@ app.use("/api/deposits", depositsRouter);
 app.use("/api/materials", materialsRouter);
 app.use("/api/orders", orderRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    status: "fail",
+    message: err.message || "Internal server error"
+  });
+});
+
 const server = app.listen(process.env.SERVER_PORT || 3000, () => {
   console.log(`Server running on port ${process.env.SERVER_PORT || 3000}!`);
   console.log(
