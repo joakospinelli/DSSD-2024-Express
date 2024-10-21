@@ -5,7 +5,7 @@ const DepositStock = require("../models/depositStockModel.js");
 const Deposit = require("../models/depositModel.js");
 const catchErrors = require("../utils/catchErrors.js");
 
-const actualizarStock = catchErrors(async (deposito, materiales) => {
+const actualizarStock = async (deposito, materiales) => {
   for (const material of materiales) {
     const { materialId, amount } = material.dataValues;
 
@@ -29,7 +29,7 @@ const actualizarStock = catchErrors(async (deposito, materiales) => {
     await depositStock.save();
   }
   return true;
-});
+}
 
 /**
  * @returns Devuelve todas las órdenes con el estado "created".
