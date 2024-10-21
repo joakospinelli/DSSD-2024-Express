@@ -14,12 +14,36 @@ router
     controller.createOrder
   );
 
-router.route("/:id").get(auth.protect, controller.getOrderById);
+router
+  .route("/:id")
+  .get(
+    auth.protect,
+    auth.requiresRoles("depósito", "administrador"),
+    controller.getOrderById
+  );
 
-router.route("/done/:id").put(auth.protect, controller.completeOrderById);
+router
+  .route("/done/:id")
+  .put(
+    auth.protect,
+    auth.requiresRoles("administrador"),
+    controller.completeOrderById
+  );
 
-router.route("/assign").put(auth.protect, controller.assignOrderById);
+router
+  .route("/assign")
+  .put(
+    auth.protect,
+    auth.requiresRoles("depósito", "administrador"),
+    controller.assignOrderById
+  );
 
-router.route("/send/:id").put(auth.protect, controller.sendOrderById);
+router
+  .route("/send/:id")
+  .put(
+    auth.protect,
+    auth.requiresRoles("depósito", "administrador"),
+    controller.sendOrderById
+  );
 
 module.exports = router;
