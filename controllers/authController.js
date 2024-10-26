@@ -80,7 +80,8 @@ exports.login = catchErrors(async (req, res) => {
     const token = signToken(user.id);
     res.cookie("jwt", token, {
         expires: new Date(Date.now() + (process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000)),
-        httpOnly: true
+        httpOnly: true,
+        sameSite: "none"
     });
 
     user.password = undefined; // para que no la muestre en el response
