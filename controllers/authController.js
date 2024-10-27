@@ -16,13 +16,16 @@ const checkPassword = async (userPassword, reqPassword) => {
 }
 
 exports.protect = catchErrors(async (req, res, next) => {
-    const token = req.cookies.jwt || req.header("authorization").split(" ")[1];
+    let token = req.cookies.jwt;
 
     if (!token) {
-        return res.status(401).json({
-            status: "fail",
-            message: "You need to be authenticated to do this action"
-        });
+        token = req.header("authorization").split(" ")[1];
+        if (!token) {
+            return res.status(401).json({
+                status: "fail",
+                message: "You need to be authenticated to do this action"
+            });
+        }
     }
 
     // promisify(jwt.verify) retorna una promesa que ejecuta jwt.verify asincrónicamente. después le paso los parámetros que necesitaría verify(token, JWT_SECRET)
@@ -80,8 +83,7 @@ exports.login = catchErrors(async (req, res) => {
     const token = signToken(user.id);
     res.cookie("jwt", token, {
         expires: new Date(Date.now() + (process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000)),
-        httpOnly: true,
-        sameSite: "none"
+        httpOnly: true
     });
 
     user.password = undefined; // para que no la muestre en el response

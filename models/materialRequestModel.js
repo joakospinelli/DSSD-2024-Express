@@ -1,5 +1,6 @@
 const sqlize = require("../database.js");
 const DataTypes = require("sequelize");
+const Material = require("../models/materialModel.js");
 
 const MaterialRequest = sqlize.define("MaterialRequest", {
     id: {
@@ -26,10 +27,9 @@ const MaterialRequest = sqlize.define("MaterialRequest", {
     }
 }, {
     tableName: "material_requests",
-    timestamps: false,
-    defaultScope: {
-        attributes: { exclude: [ "id", "materialId", "requestId" ] }
-    }
+    timestamps: false
 });
+
+MaterialRequest.belongsTo(Material, { foreignKey: "materialId", as: "material" });
 
 module.exports = MaterialRequest;

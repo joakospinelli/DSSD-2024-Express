@@ -1,6 +1,7 @@
 const sqlize = require("../database.js");
 const DataTypes = require("sequelize");
 const User = require("./userModel.js");
+const Deposit = require("./depositModel.js");
 const MaterialRequest = require("./materialRequestModel.js");
 
 const Request = sqlize.define(
@@ -42,7 +43,7 @@ const Request = sqlize.define(
     },
     createdAt: {
       type: DataTypes.DATE,
-      default: new Date(Date.now()),
+      defaultValue: new Date(Date.now()),
       field: "created_at",
     },
   },
@@ -53,6 +54,7 @@ const Request = sqlize.define(
 );
 
 Request.belongsTo(User, { foreignKey: "recolectorId", as: "recolector" });
+Request.belongsTo(Deposit, { foreignKey: "depositId", as: "deposit" });
 Request.hasMany(MaterialRequest, { foreignKey: "requestId", as: "materials" });
 
 module.exports = Request;
