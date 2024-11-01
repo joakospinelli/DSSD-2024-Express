@@ -19,7 +19,7 @@ exports.protect = catchErrors(async (req, res, next) => {
     let token = req.cookies.jwt;
 
     if (!token) {
-        token = req.header("authorization").split(" ")[1];
+        token = req.header("authorization")?.split(" ")[1] || null;
         if (!token) {
             return res.status(401).json({
                 status: "fail",
