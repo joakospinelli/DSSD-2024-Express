@@ -312,3 +312,20 @@ exports.createOrder = catchErrors(async (req, res) => {
       });
     });
 });
+
+exports.getOrdersByCurrentDeposit = catchErrors(async (req, res, next) => {
+
+  if (!req.user.depositId) throw new Error("Current user doesn't have a deposit.");
+
+  const orders = await Order.findAll({
+    where: { depositId: req.user.depositId }
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      results: orders.length,
+      orders
+    }
+  })
+});

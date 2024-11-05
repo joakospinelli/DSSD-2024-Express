@@ -270,6 +270,52 @@ paths:
                   message:
                     type: string
                     example: An order must have materials.
+  /api/orders/me:
+    get:
+      tags:
+        - "Órdenes"
+      summary: Obtener órdenes de un depósito
+      description: Devuelve las órdenes trabajadas por el depósito del usuario actual
+      responses:
+        200:
+          description: Órdenes obtenidas con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: integer
+                        example: 1
+                      orders:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            status:
+                              type: string
+                              example: assigned
+                            depositId:
+                              type: number
+                              example: 1
+                            createdAt:
+                              type: string
+                              example: "2024-11-02T13:56:36.069Z"
+                            completedAt:
+                              type: string
+                              example: null
+                            observation:
+                              type: string
+                              example: observation
   /api/orders/{id}:
     get:
       tags:

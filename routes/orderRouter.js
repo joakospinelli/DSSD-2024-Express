@@ -5,6 +5,8 @@ const { Router } = require("express");
 
 const router = Router();
 
+router.get("/me", auth.protect, auth.requiresRoles("depósito"), controller.getOrdersByCurrentDeposit);
+
 router
   .route("/")
   .get(auth.protect, controller.getAvailableOrders)
