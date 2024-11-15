@@ -1,7 +1,9 @@
+const Deposit = require("../models/depositModel.js");
+const FeaturedDeposit = require("../models/featuredDepositModel.js");
 const Material = require("../models/materialModel.js");
 const catchErrors = require("../utils/catchErrors.js");
 
-exports.getAllMaterials = catchErrors(async (req, res) => {
+exports.getAllMaterials = catchErrors(async (req, res, next) => {
     const materials = await Material.findAll();
 
     return res.status(200).json({
@@ -13,7 +15,7 @@ exports.getAllMaterials = catchErrors(async (req, res) => {
     });
 });
 
-exports.createMaterial = catchErrors(async (req, res) => {
+exports.createMaterial = catchErrors(async (req, res, next) => {
     const { name, unit, pricePerUnit } = req.body;
 
     if (!name || !pricePerUnit) return res.status(400).json({
@@ -39,4 +41,27 @@ exports.createMaterial = catchErrors(async (req, res) => {
                 message: err.parent.detail
             });
         })
+});
+
+exports.getFeaturedDepositsByMaterial = catchErrors(async (req, res, next) => {
+    const id = +req.params.id;
+
+    console.log(req.params.id);
+
+    const deposits = await FeaturedDeposit.findAll({
+        where: { materialId: id },
+        include: [{
+            model: Deposit,
+            required: false,
+            as: "deposit"
+        }]
+    });
+
+    return res.status(200).json({
+        status: "success",
+        data: {
+            results: deposits.length,
+            deposits
+        }
+    })
 });

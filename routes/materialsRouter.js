@@ -7,5 +7,6 @@ const router = Router();
 router.route("/")
     .get(controller.getAllMaterials)
     .post(auth.protect, auth.requiresRoles("administrador"), controller.createMaterial);
+router.get("/:id/deposits", auth.protect, auth.requiresRoles("administrador"), controller.getFeaturedDepositsByMaterial);
 
 module.exports = router;

@@ -57,6 +57,10 @@ const User = sqlize.define("User", {
         type: DataTypes.DATE,
         defaultValue: new Date(),
         field: "created_at"
+    },
+    bonitaUserId: {
+        type: DataTypes.INTEGER,
+        field: "bonita_user_id"
     }
 }, {
     hooks: {

@@ -15,10 +15,15 @@ const depositsRouter = require("./routes/depositsRouter.js");
 const materialsRouter = require("./routes/materialsRouter.js");
 const orderRouter = require("./routes/orderRouter.js");
 
+const Material = require("./models/materialModel.js")
+const Deposit = require("./models/depositModel.js");
+const FeaturedDeposit = require("./models/featuredDepositModel.js");
+
 const checkDatabase = async () => {
   try {
     await sqlize.authenticate();
     await sqlize.sync();
+
     console.log(`Connected to database ${process.env.DB_DATABASE}!`);
   } catch (err) {
     console.error("Unable to connect to database: ", err);

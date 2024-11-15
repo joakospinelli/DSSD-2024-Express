@@ -3,6 +3,7 @@ const OrderMaterial = require("../models/orderMaterialModel.js");
 const Material = require("../models/materialModel.js");
 const DepositStock = require("../models/depositStockModel.js");
 const Deposit = require("../models/depositModel.js");
+const FeaturedDeposit = require("../models/featuredDepositModel.js");
 const catchErrors = require("../utils/catchErrors.js");
 
 const actualizarStock = async (deposito, materiales) => {
@@ -140,22 +141,22 @@ exports.completeOrderById = catchErrors(async (req, res) => {
  * @returns La orden con el estado "assigned".
  */
 exports.assignOrderById = catchErrors(async (req, res) => {
-  if (!req.body.id || typeof req.body.id !== "number") {
+  if (!req.body.id || isNaN(+req.body.id)) {
     return res.status(400).json({
       status: "fail",
-      message: "Invalid or missing order Id.",
+      message: "Invalid or missing order ID.",
     });
   }
 
-  if (!req.body.depositId || typeof req.body.depositId !== "number") {
+  if (!req.body.depositId || isNaN(+req.body.id)) {
     return res.status(400).json({
       status: "fail",
-      message: "Invalid or missing depositId.",
+      message: "Invalid or missing deposit ID.",
     });
   }
 
-  const id = req.body.id;
-  const depositId = req.body.depositId;
+  const { id, depositId, caseId } = req.body;
+
   const order = await Order.findByPk(id);
   const deposit = await Deposit.findByPk(depositId);
 
@@ -171,14 +172,15 @@ exports.assignOrderById = catchErrors(async (req, res) => {
       message: `Couldn't find deposit with ID ${depositId}`,
     });
 
-  if (!(order.status == "created"))
+  if (!(order.status === "created"))
     return res.status(405).json({
       status: "fail",
-      message: `Order status must be "created" to complete the order.`,
+      message: `Order status must be "created" to assign the order.`,
     });
 
   order.status = "assigned";
   order.depositId = depositId;
+  order.caseId = caseId;
 
   await order
     .save()
@@ -250,6 +252,15 @@ exports.sendOrderById = catchErrors(async (req, res) => {
   }
 
   order.status = "sent";
+  order.completedAt = new Date().toJSON();
+
+  order.materials.forEach(async material => {
+    const featured = FeaturedDeposit.build({ depositId: order.depositId, materialId: material.id });
+
+    await featured.save()
+      .then(_ => null)
+      .catch(_ => console.log(`Deposit with ID ${order.depositId} was already featuring material ${material.id}`))
+  });
 
   await order
     .save()

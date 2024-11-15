@@ -33,6 +33,10 @@ const Order = sqlize.define(
       type: DataTypes.TEXT,
       field: "observations",
     },
+    caseId: {
+      type: DataTypes.INTEGER,
+      field: "case_id"
+    },
   },
   {
     tableName: "orders",
